@@ -1,0 +1,23 @@
+{
+  "name": "tourist-safety-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tourist safety assistant demo using Azure Functions and a mock WhatsApp chat.",
+  "main": "src/functions/*.js",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "scripts": {
+    "start": "func start",
+    "create:foundry-agent": "node scripts/create-foundry-agent.mjs",
+    "eval:demo": "node scripts/evaluate-demo.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@azure/ai-projects": "^2.1.1",
+    "@azure/data-tables": "^13.3.2",
+    "@azure/functions": "^4.7.3",
+    "@azure/identity": "^4.13.1",
+    "dotenv": "^17.4.2"
+  }
+}
