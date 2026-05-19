@@ -153,7 +153,20 @@ async function runMockTouristSafetyAgent(message) {
 }
 
 function includesAny(text, keywords) {
-  return keywords.some((keyword) => text.includes(keyword));
+  return keywords.some((keyword) => keywordMatches(text, keyword));
+}
+
+function keywordMatches(text, keyword) {
+  // Thai has no word boundaries, so Thai keywords use plain substring matching.
+  if (/[฀-๿]/.test(keyword)) {
+    return text.includes(keyword);
+  }
+
+  // English keywords match as whole words (allowing simple -s/-ed/-ing/-er
+  // inflections). This prevents substring false positives such as "accident"
+  // inside "accidentally", "gun" inside "begun", or "bus" inside "business".
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`\\b${escaped}(?:s|ed|ing|er)?(?![a-z])`, "i").test(text);
 }
 
 function buildReply({ language, incidentType, severity }) {

@@ -79,6 +79,20 @@ test("classifies being followed as a high severity crime", async () => {
   assert.equal(result.should_create_case, true);
 });
 
+test("'accidentally' does not trigger a high severity accident classification", async () => {
+  const result = await runMockTouristSafetyAgent("I accidentally overstayed my tourist visa by 5 days");
+  assert.equal(result.incident_type, "immigration");
+  assert.equal(result.severity, "medium");
+});
+
+test("substring words do not cause false classifications (business, begun)", async () => {
+  const business = await runMockTouristSafetyAgent("I have a business meeting today");
+  assert.notEqual(business.incident_type, "transport");
+
+  const begun = await runMockTouristSafetyAgent("My tour has begun and I feel great");
+  assert.notEqual(begun.incident_type, "crime");
+});
+
 // --- Thai incident classification ---
 
 test("classifies Thai car accident via รถชน", async () => {
