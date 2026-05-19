@@ -907,15 +907,15 @@ const html = `<!doctype html>
           <div class="field-grid">
             <div class="field span-2">
               <label for="caseReportSummary">Summary</label>
-              <textarea id="caseReportSummary" placeholder="Short summary for officer follow-up"></textarea>
+              <textarea id="caseReportSummary"></textarea>
             </div>
             <div class="field">
               <label for="caseReportAction">Recommended action</label>
-              <input id="caseReportAction" placeholder="Officer follow-up recommended">
+              <input id="caseReportAction">
             </div>
             <div class="field">
               <label for="caseReportPriority">Priority note</label>
-              <input id="caseReportPriority" placeholder="urgent, normal, needs more evidence">
+              <input id="caseReportPriority">
             </div>
           </div>
         </div>
