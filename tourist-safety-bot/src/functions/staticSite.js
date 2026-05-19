@@ -49,7 +49,7 @@ const html = `<!doctype html>
       border-radius: 7px;
       display: grid;
       place-items: center;
-      background: #111827;
+      background: #ffffff;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       flex-shrink: 0;
     }
