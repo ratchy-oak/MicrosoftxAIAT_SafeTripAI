@@ -735,9 +735,6 @@ const html = `<!doctype html>
           <span id="navCount">0</span>
         </a>
       </div>
-      <div class="sidebar-note">
-        Tourist safety cases from LINE OA, external API calls, and dashboard entries appear here for officer follow-up.
-      </div>
     </aside>
     <main class="main">
       <section class="topbar">
