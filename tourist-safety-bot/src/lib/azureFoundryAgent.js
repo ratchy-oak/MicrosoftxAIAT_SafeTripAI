@@ -109,6 +109,46 @@ function collectText(value, chunks) {
   }
 }
 
+function normalizeIncidentType(raw) {
+  if (INCIDENT_TYPES.has(raw)) {
+    return raw;
+  }
+
+  const lower = String(raw || "")
+    .toLowerCase()
+    .replace(/[\s_\-]/g, "");
+
+  if (/scam|fraud|ripoff|overcharg/.test(lower)) {
+    return "scam";
+  }
+
+  if (/transport|taxi|tuktuk|vehicle|bus|train|fare/.test(lower)) {
+    return "transport";
+  }
+
+  if (/crime|rob|steal|assault|attack|theft/.test(lower)) {
+    return "crime";
+  }
+
+  if (/lost|lostitem|missing/.test(lower)) {
+    return "lost_item";
+  }
+
+  if (/accident|crash|collide/.test(lower)) {
+    return "accident";
+  }
+
+  if (/medical|health|sick|hospital|emergency/.test(lower)) {
+    return "medical_emergency";
+  }
+
+  if (/immigra|visa|overstay|border/.test(lower)) {
+    return "immigration";
+  }
+
+  return "other";
+}
+
 function normalizeAgentResult(text) {
   const parsed = parseJsonFromText(text);
 
@@ -116,7 +156,7 @@ function normalizeAgentResult(text) {
     throw new Error("Azure Foundry Agent did not return the expected JSON shape");
   }
 
-  const incidentType = INCIDENT_TYPES.has(parsed.incident_type) ? parsed.incident_type : "other";
+  const incidentType = normalizeIncidentType(parsed.incident_type);
   const severity = SEVERITIES.has(parsed.severity) ? parsed.severity : "low";
   const shouldCreateCase =
     typeof parsed.should_create_case === "boolean"

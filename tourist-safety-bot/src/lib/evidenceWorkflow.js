@@ -22,12 +22,26 @@ async function processTravelerMessage(normalized) {
     : null;
 
   if (activeCase) {
+    // Guard: if the case is waiting for confirmation but the user is describing a new incident,
+    // discard the stale case and start fresh instead of merging old evidence into the new report.
+    if (
+      activeCase.workflow_state === "confirm_submit" &&
+      !isConfirmation(normalized.message) &&
+      !isGeneralAdviceQuestion(normalized.message)
+    ) {
+      const agentResult = await runTouristSafetyAgent(normalized.message);
+
+      if (agentResult.should_create_case) {
+        await clearConversation(normalized.channel, normalized.sender);
+        return createNewCase(normalized, agentResult);
+      }
+    }
+
     return continueActiveCase(normalized, activeCase);
   }
 
-  const agentResult = await runTouristSafetyAgent(normalized.message);
-
   if (isGeneralAdviceQuestion(normalized.message)) {
+    const agentResult = await runTouristSafetyAgent(normalized.message);
     const reply = buildGeneralAdviceReply(normalized.message, language, agentResult);
 
     return {
@@ -45,6 +59,8 @@ async function processTravelerMessage(normalized) {
     };
   }
 
+  const agentResult = await runTouristSafetyAgent(normalized.message);
+
   if (!agentResult.should_create_case) {
     return {
       reply: agentResult.reply,
@@ -59,6 +75,10 @@ async function processTravelerMessage(normalized) {
     };
   }
 
+  return createNewCase(normalized, agentResult);
+}
+
+async function createNewCase(normalized, agentResult) {
   const collectedFields = extractFieldsFromMessage(normalized.message, {
     incident_type: agentResult.incident_type,
     channel: normalized.channel,
