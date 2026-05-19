@@ -1141,7 +1141,7 @@ const html = `<!doctype html>
     }
 
     function setField(id, value) {
-      document.querySelector("#" + id).value = value || "";
+      document.querySelector("#" + id).value = value || "-";
     }
 
     function getPayload() {
