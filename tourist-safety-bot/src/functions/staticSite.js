@@ -892,10 +892,6 @@ const html = `<!doctype html>
               <label for="caseCollectedSuspect">Suspect detail</label>
               <input id="caseCollectedSuspect">
             </div>
-            <div class="field">
-              <label for="caseCollectedDeadline">Deadline</label>
-              <input id="caseCollectedDeadline">
-            </div>
             <div class="field span-2">
               <label for="caseCollectedEvidence">Evidence</label>
               <textarea id="caseCollectedEvidence"></textarea>
@@ -1175,7 +1171,6 @@ const html = `<!doctype html>
       setField("caseCollectedSafety", source.current_safety || "");
       setField("caseCollectedInjury", source.injury_status || "");
       setField("caseCollectedSuspect", source.suspect_detail || "");
-      setField("caseCollectedDeadline", source.deadline || "");
       setField("caseCollectedEvidence", source.evidence || "");
     }
 
@@ -1196,7 +1191,6 @@ const html = `<!doctype html>
       current_safety: "caseCollectedSafety",
       injury_status: "caseCollectedInjury",
       suspect_detail: "caseCollectedSuspect",
-      deadline: "caseCollectedDeadline",
       evidence: "caseCollectedEvidence",
       location: "caseLocation",
       last_seen_location: "caseLocation",
@@ -1238,7 +1232,6 @@ const html = `<!doctype html>
         current_safety: document.querySelector("#caseCollectedSafety").value,
         injury_status: document.querySelector("#caseCollectedInjury").value,
         suspect_detail: document.querySelector("#caseCollectedSuspect").value,
-        deadline: document.querySelector("#caseCollectedDeadline").value,
         evidence: document.querySelector("#caseCollectedEvidence").value
       });
 
