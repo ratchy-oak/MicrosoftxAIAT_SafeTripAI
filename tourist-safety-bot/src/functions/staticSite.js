@@ -409,6 +409,7 @@ const html = `<!doctype html>
       color: #233142;
       margin-bottom: 12px;
     }
+    .field-needed::placeholder { color: #dc2626; }
     .field-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -857,47 +858,47 @@ const html = `<!doctype html>
           <div class="field-grid">
             <div class="field">
               <label for="caseCollectedTime">Time</label>
-              <input id="caseCollectedTime" placeholder="May 18, around 8 PM">
+              <input id="caseCollectedTime">
             </div>
             <div class="field">
               <label for="caseCollectedAmount">Amount</label>
-              <input id="caseCollectedAmount" placeholder="1200 baht">
+              <input id="caseCollectedAmount">
             </div>
             <div class="field">
               <label for="caseCollectedContact">Contact</label>
-              <input id="caseCollectedContact" placeholder="LINE ID, phone, or email">
+              <input id="caseCollectedContact">
             </div>
             <div class="field">
               <label for="caseCollectedItem">Item</label>
-              <input id="caseCollectedItem" placeholder="passport, wallet, phone">
+              <input id="caseCollectedItem">
             </div>
             <div class="field">
               <label for="caseCollectedParty">Person / business</label>
-              <input id="caseCollectedParty" placeholder="taxi, shop, hotel, driver">
+              <input id="caseCollectedParty">
             </div>
             <div class="field">
               <label for="caseCollectedVehicle">Route / vehicle</label>
-              <input id="caseCollectedVehicle" placeholder="taxi plate, route, vehicle detail">
+              <input id="caseCollectedVehicle">
             </div>
             <div class="field">
               <label for="caseCollectedSafety">Current safety</label>
-              <input id="caseCollectedSafety" placeholder="safe now, still in danger">
+              <input id="caseCollectedSafety">
             </div>
             <div class="field">
               <label for="caseCollectedInjury">Injury status</label>
-              <input id="caseCollectedInjury" placeholder="no injury, injured, bleeding">
+              <input id="caseCollectedInjury">
             </div>
             <div class="field">
               <label for="caseCollectedSuspect">Suspect detail</label>
-              <input id="caseCollectedSuspect" placeholder="appearance, direction, name">
+              <input id="caseCollectedSuspect">
             </div>
             <div class="field">
               <label for="caseCollectedDeadline">Deadline</label>
-              <input id="caseCollectedDeadline" placeholder="visa expiry, appointment, due date">
+              <input id="caseCollectedDeadline">
             </div>
             <div class="field span-2">
               <label for="caseCollectedEvidence">Evidence</label>
-              <textarea id="caseCollectedEvidence" placeholder="receipt photo, screenshot, chat record, plate number"></textarea>
+              <textarea id="caseCollectedEvidence"></textarea>
             </div>
           </div>
         </div>
@@ -1129,6 +1130,7 @@ const html = `<!doctype html>
       setField("caseReply", item && item.last_reply || "");
       setCollectedFields(item && item.collected_fields || {});
       setCaseReportFields(item && item.case_report || {}, item || {});
+      applyMissingFieldHints(item && item.missing_fields || []);
 
       modal.classList.add("open");
       modal.setAttribute("aria-hidden", "false");
@@ -1141,7 +1143,7 @@ const html = `<!doctype html>
     }
 
     function setField(id, value) {
-      document.querySelector("#" + id).value = value || "-";
+      document.querySelector("#" + id).value = value || "";
     }
 
     function getPayload() {
@@ -1182,6 +1184,41 @@ const html = `<!doctype html>
       setField("caseReportSummary", source.summary || item.description || "");
       setField("caseReportAction", source.recommended_action || "");
       setField("caseReportPriority", source.priority_note || "");
+    }
+
+    const MISSING_FIELD_INPUT = {
+      time: "caseCollectedTime",
+      amount: "caseCollectedAmount",
+      contact: "caseCollectedContact",
+      item: "caseCollectedItem",
+      person_or_business: "caseCollectedParty",
+      route_or_vehicle: "caseCollectedVehicle",
+      current_safety: "caseCollectedSafety",
+      injury_status: "caseCollectedInjury",
+      suspect_detail: "caseCollectedSuspect",
+      deadline: "caseCollectedDeadline",
+      evidence: "caseCollectedEvidence",
+      location: "caseLocation",
+      last_seen_location: "caseLocation",
+      description: "caseDescription"
+    };
+
+    function applyMissingFieldHints(missingFields) {
+      Object.values(MISSING_FIELD_INPUT).forEach(id => {
+        const el = document.querySelector("#" + id);
+        if (!el) return;
+        el.classList.remove("field-needed");
+        el.placeholder = "";
+      });
+      missingFields.forEach(field => {
+        const id = MISSING_FIELD_INPUT[field];
+        if (!id) return;
+        const el = document.querySelector("#" + id);
+        if (el && !el.value) {
+          el.classList.add("field-needed");
+          el.placeholder = "Need data";
+        }
+      });
     }
 
     function buildCollectedFields() {
