@@ -190,6 +190,15 @@ async function continueActiveCase(normalized, activeCase) {
     timestamp: normalized.timestamp
   });
   const collectedFields = mergeCollectedFields(activeCase.collected_fields || {}, nextFields);
+
+  // The reply answers whichever field the bot just asked for. If keyword extraction
+  // did not capture it, store the user's message directly so the workflow always
+  // advances instead of asking the same question again.
+  const askedField = (activeCase.missing_fields || [])[0];
+  if (askedField && !hasField(collectedFields, askedField)) {
+    collectedFields[askedField] = normalized.message.trim();
+  }
+
   const missingFields = calculateMissingFields(activeCase.incident_type, collectedFields);
   const workflowState = missingFields.length ? "collect_evidence" : "confirm_submit";
   const evidenceStatus = missingFields.length ? "partial" : "full";
@@ -293,9 +302,12 @@ function extractFieldsFromMessage(message, context = {}) {
     fields.evidence = text;
   }
 
-  if (includesAny(lower, ["taxi", "driver", "shop", "seller", "hotel", "tour", "plate", "license", "แท็กซี่", "คนขับ", "ร้าน", "โรงแรม", "ทะเบียน"])) {
-    fields.person_or_business = text;
-    fields.route_or_vehicle = text;
+  // Store only the matched keyword, not the whole incident message, so the
+  // dashboard field stays clean (e.g. "taxi" rather than the full sentence).
+  const businessKeyword = ["tuk-tuk", "tuk tuk", "taxi", "driver", "shop", "seller", "hotel", "tour", "แท็กซี่", "คนขับ", "ร้าน", "โรงแรม"]
+    .find((keyword) => lower.includes(keyword));
+  if (businessKeyword) {
+    fields.person_or_business = businessKeyword;
   }
 
   if (includesAny(lower, ["safe", "not safe", "danger", "alone", "ปลอดภัย", "ไม่ปลอดภัย", "อันตราย"])) {

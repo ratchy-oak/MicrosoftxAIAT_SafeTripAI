@@ -193,6 +193,46 @@ test("preserves LINE user ID as contact even when phone number appears in messag
   assert.equal(result.case.collected_fields.contact, `line:${sender}`);
 });
 
+test("a reply with no matching keyword still fills the asked field (no infinite loop)", async () => {
+  const sender = `loop-guard-${Date.now()}`;
+
+  const first = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "I was robbed near Asok BTS",
+    location: null
+  });
+
+  assert.equal(first.action, "case_started");
+  const initialMissing = first.case.missing_fields.length;
+  assert.ok(initialMissing > 0);
+
+  // Vague reply that matches none of the extraction keywords.
+  const second = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "I did not see clearly",
+    location: null
+  });
+
+  assert.equal(second.action, "case_updated");
+  assert.ok(second.case.missing_fields.length < initialMissing);
+});
+
+test("free-text suspect description fills suspect_detail and advances the workflow", async () => {
+  const sender = `suspect-${Date.now()}`;
+
+  await processTravelerMessage({ channel: "line", sender, message: "I was robbed near Asok BTS", location: null });
+
+  let result;
+  for (const reply of ["I am safe now", "around 9 PM", "He was wearing a white suit and ran toward the BTS"]) {
+    result = await processTravelerMessage({ channel: "line", sender, message: reply, location: null });
+  }
+
+  assert.equal(result.case.collected_fields.suspect_detail, "He was wearing a white suit and ran toward the BTS");
+  assert.ok(!result.case.missing_fields.includes("suspect_detail"));
+});
+
 test("returns guidance_only for null message without crashing", async () => {
   const result = await processTravelerMessage({ channel: "line", sender: "user-1", message: null, location: null });
   assert.equal(result.action, "guidance_only");
