@@ -42,66 +42,21 @@ const html = `<!doctype html>
     }
     .app-shell {
       min-height: 100vh;
-      display: grid;
-      grid-template-columns: 244px 1fr;
-    }
-    .sidebar {
-      background: #111827;
-      color: #e5edf7;
-      padding: 26px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 750;
-      font-size: 18px;
-      letter-spacing: 0;
     }
     .brand-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
       display: grid;
       place-items: center;
-      background: #ffffff;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+      background: #111827;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
     }
     .brand-logo svg {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       display: block;
-    }
-    .nav-label {
-      color: #94a3b8;
-      font-size: 12px;
-      text-transform: uppercase;
-      margin: 10px 8px 8px;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      color: #e5edf7;
-      text-decoration: none;
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.08);
-      font-weight: 650;
-    }
-    .sidebar-note {
-      margin-top: auto;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 8px;
-      padding: 14px;
-      color: #cbd5e1;
-      font-size: 13px;
-      line-height: 1.45;
-      background: rgba(255,255,255,0.05);
     }
     .main {
       min-width: 0;
@@ -489,8 +444,6 @@ const html = `<!doctype html>
       white-space: nowrap;
     }
     @media (max-width: 1320px) and (min-width: 821px) {
-      .app-shell { grid-template-columns: 220px 1fr; }
-      .sidebar { padding-left: 16px; padding-right: 16px; }
       .main { padding: 26px 24px; }
       table {
         min-width: 1120px;
@@ -618,8 +571,6 @@ const html = `<!doctype html>
       transform: translateY(0);
     }
     @media (max-width: 1000px) {
-      .app-shell { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
       .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .panel-head { grid-template-columns: 1fr; }
       .main { padding: 18px; }
@@ -717,29 +668,19 @@ const html = `<!doctype html>
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-logo" aria-hidden="true">
-          <svg viewBox="0 0 100 112" role="img">
-            <path fill="#2ecc71" d="M50 2 88 16v32c0 29.5-15.9 52.5-38 62C27.9 100.5 12 77.5 12 48V16L50 2Z"/>
-            <path fill="#ffffff" d="M50 13 22 23v25c0 2.8.2 5.5.5 8H50V13Z"/>
-            <path fill="#ffffff" d="M50 56v41.8C65.4 90 76.4 75 79 56H50Z"/>
-          </svg>
-        </div>
-        <span>SafeTripAI</span>
-      </div>
-      <div>
-        <div class="nav-label">Operations</div>
-        <a class="nav-item" href="/api/dashboard">
-          <span>Case dashboard</span>
-          <span id="navCount">0</span>
-        </a>
-      </div>
-    </aside>
     <main class="main">
       <section class="topbar">
         <div>
-          <h1>Tourist Safety Cases</h1>
+          <h1 style="display:flex;align-items:center;gap:10px;">
+            <div class="brand-logo" aria-hidden="true">
+              <svg viewBox="0 0 100 112" role="img">
+                <path fill="#2ecc71" d="M50 2 88 16v32c0 29.5-15.9 52.5-38 62C27.9 100.5 12 77.5 12 48V16L50 2Z"/>
+                <path fill="#ffffff" d="M50 13 22 23v25c0 2.8.2 5.5.5 8H50V13Z"/>
+                <path fill="#ffffff" d="M50 56v41.8C65.4 90 76.4 75 79 56H50Z"/>
+              </svg>
+            </div>
+            SafeTrip AI : Tourist Safety Cases
+          </h1>
           <div class="subtitle">Track incoming reports, update follow-up status, and manage demo cases in one place.</div>
         </div>
         <div class="actions">
