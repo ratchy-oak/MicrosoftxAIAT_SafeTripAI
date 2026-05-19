@@ -957,7 +957,6 @@ const html = `<!doctype html>
       caseRows: document.querySelector("#caseRows"),
       closedCases: document.querySelector("#closedCases"),
       highCases: document.querySelector("#highCases"),
-      navCount: document.querySelector("#navCount"),
       searchCases: document.querySelector("#searchCases"),
       severityFilter: document.querySelector("#severityFilter"),
       statusFilter: document.querySelector("#statusFilter"),
@@ -1067,7 +1066,6 @@ const html = `<!doctype html>
       elements.highCases.textContent = high;
       elements.activeCases.textContent = active;
       elements.closedCases.textContent = closed;
-      elements.navCount.textContent = total;
     }
 
     function renderTable() {
