@@ -378,13 +378,72 @@ function buildReply({ language, incidentType, severity, workflowState, missingFi
 }
 
 function buildMissingFieldQuestion(language, missingFields, incidentType) {
-  const nextFields = missingFields.slice(0, 3);
+  const nextField = missingFields[0];
 
   if (language === "th") {
-    return `เพื่อเตรียมรายงาน${formatIncidentType(incidentType, language)} ขอข้อมูลเพิ่ม: ${nextFields.map((field) => fieldLabel(field, language)).join(", ")} ครับ`;
+    return fieldQuestion(nextField, language, incidentType);
   }
 
-  return `To prepare a ${formatIncidentType(incidentType, language)} report, please share: ${nextFields.map((field) => fieldLabel(field, language)).join(", ")}.`;
+  return fieldQuestion(nextField, language, incidentType);
+}
+
+function fieldQuestion(field, language, incidentType) {
+  const questions = {
+    th: {
+      current_safety: "ตอนนี้คุณปลอดภัยไหมครับ?",
+      injury_status: "มีใครบาดเจ็บไหมครับ?",
+      urgent_help_needed: "ต้องการความช่วยเหลือเร่งด่วนไหมครับ เช่น รถพยาบาลหรือตำรวจ?",
+      location: "เหตุเกิดขึ้นที่ไหนครับ?",
+      last_seen_location: "เห็นของครั้งล่าสุดที่ไหนครับ?",
+      time: "เกิดขึ้นเมื่อไหร่ครับ?",
+      amount: "จ่ายเงินหรือถูกเรียกเก็บเงินไปเท่าไหร่ครับ?",
+      evidence: "มีหลักฐานไหมครับ เช่น ใบเสร็จ รูป สกรีนช็อต หรือป้ายทะเบียน?",
+      person_or_business: "ช่วยบอกชื่อร้าน คนขับ หรือทะเบียนรถที่เกี่ยวข้องได้ไหมครับ?",
+      route_or_vehicle: "เส้นทางหรือรถที่ใช้คืออะไรครับ?",
+      suspect_detail: "ช่วยอธิบายคนที่ก่อเหตุได้ไหมครับ เช่น รูปร่าง เสื้อผ้า หรือทิศทางที่หนี?",
+      item: "ของที่หายคืออะไรครับ?",
+      item_detail: "ช่วยอธิบายสิ่งของให้ละเอียดขึ้นได้ไหมครับ?",
+      symptoms: "มีอาการอะไรบ้างครับ?",
+      issue_type: "ปัญหาด้านตรวจคนเข้าเมืองเป็นเรื่องอะไรครับ?",
+      nationality: "สัญชาติอะไรครับ?",
+      document_detail: "เอกสารที่เกี่ยวข้องคืออะไรครับ?",
+      deadline: "มีกำหนดเวลาหรือวันหมดอายุที่ต้องรีบดำเนินการไหมครับ?",
+      contact: "ช่องทางที่ติดต่อกลับได้ดีที่สุดคืออะไรครับ?",
+      description: "ช่วยเล่าเหตุการณ์ที่เกิดขึ้นให้ละเอียดขึ้นได้ไหมครับ?"
+    },
+    en: {
+      current_safety: "Are you currently safe?",
+      injury_status: "Is anyone injured?",
+      urgent_help_needed: "Do you need urgent help such as an ambulance or police?",
+      location: "Where did this happen?",
+      last_seen_location: "Where did you last have it?",
+      time: "When did this happen?",
+      amount: "How much were you charged or did you pay?",
+      evidence: "Do you have any evidence such as a receipt, photo, screenshot, or plate number?",
+      person_or_business: "Can you describe the driver, shop, or business involved?",
+      route_or_vehicle: "What was the route or vehicle involved?",
+      suspect_detail: "Can you describe the person who did this — appearance, clothing, or direction they went?",
+      item: "What item did you lose?",
+      item_detail: "Can you describe the item in more detail?",
+      symptoms: "What symptoms are you experiencing?",
+      issue_type: "What type of immigration issue is this?",
+      nationality: "What is your nationality?",
+      document_detail: "Which documents are involved?",
+      deadline: "Is there a deadline or expiry date you need to act on?",
+      contact: "What is the best way to reach you?",
+      description: "Can you describe what happened in more detail?"
+    }
+  };
+
+  const q = (questions[language] || questions.en)[field];
+  if (q) {
+    return q;
+  }
+
+  // Fallback for any unmapped field
+  return language === "th"
+    ? `ช่วยแชร์ข้อมูลเกี่ยวกับ ${fieldLabel(field, language)} ได้ไหมครับ?`
+    : `Could you share ${fieldLabel(field, language)}?`;
 }
 
 function buildConfirmationReply(language, incidentType, severity, fields) {
