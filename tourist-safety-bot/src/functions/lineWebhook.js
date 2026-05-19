@@ -21,7 +21,18 @@ app.http("lineWebhook", {
       };
     }
 
-    const body = JSON.parse(rawBody || "{}");
+    let body;
+    try {
+      body = JSON.parse(rawBody || "{}");
+    } catch {
+      context.warn("LINE webhook rejected: invalid JSON body");
+      return {
+        status: 400,
+        jsonBody: {
+          error: "Invalid request body"
+        }
+      };
+    }
     context.log("LINE webhook received", JSON.stringify(body));
 
     const messages = extractLineMessages(body);
@@ -47,6 +58,15 @@ app.http("lineWebhook", {
           message: normalized.message
         })
       );
+
+      if (normalized.message.startsWith("[Unsupported")) {
+        const unsupportedReply = /[฀-๿]/.test(normalized.message)
+          ? "ระบบรองรับเฉพาะข้อความตัวอักษรครับ กรุณาพิมพ์อธิบายปัญหาของคุณ"
+          : "Please send a text message describing your situation.";
+        await replyLineMessage(normalized.replyToken, unsupportedReply);
+        results.push({ received_message: normalized.message, action: "unsupported_message_type" });
+        continue;
+      }
 
       const workflowResult = await processTravelerMessage(normalized);
       context.log("Workflow result", JSON.stringify(workflowResult));

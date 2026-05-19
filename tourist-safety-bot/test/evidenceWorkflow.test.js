@@ -177,3 +177,37 @@ test("extracts time and place from later evidence updates without overwriting th
   assert.ok(!second.case.missing_fields.includes("last_seen_location"));
   assert.ok(!second.case.missing_fields.includes("time"));
 });
+
+test("preserves LINE user ID as contact even when phone number appears in message", async () => {
+  const sender = `contact-test-${Date.now()}`;
+
+  const result = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "I was overcharged by taxi near Siam. You can call the driver at 0812345678.",
+    location: null
+  });
+
+  assert.equal(result.action, "case_started");
+  // LINE user ID should be the contact, not the extracted phone number
+  assert.equal(result.case.collected_fields.contact, `line:${sender}`);
+});
+
+test("returns guidance_only for null message without crashing", async () => {
+  const result = await processTravelerMessage({ channel: "line", sender: "user-1", message: null, location: null });
+  assert.equal(result.action, "guidance_only");
+  assert.equal(result.case, null);
+  assert.equal(typeof result.reply, "string");
+});
+
+test("returns guidance_only for empty message without crashing", async () => {
+  const result = await processTravelerMessage({ channel: "line", sender: "user-1", message: "   ", location: null });
+  assert.equal(result.action, "guidance_only");
+  assert.equal(result.case, null);
+});
+
+test("returns guidance_only for null normalized object without crashing", async () => {
+  const result = await processTravelerMessage(null);
+  assert.equal(result.action, "guidance_only");
+  assert.equal(result.case, null);
+});

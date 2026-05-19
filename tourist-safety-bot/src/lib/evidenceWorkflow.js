@@ -15,6 +15,16 @@ const evidenceRequirements = {
 };
 
 async function processTravelerMessage(normalized) {
+  if (!normalized || typeof normalized.message !== "string" || !normalized.message.trim()) {
+    const reply = "Please send a text message describing your situation.";
+    return {
+      reply,
+      agent_result: { reply, should_create_case: false, workflow_state: "guidance", evidence_status: "none", missing_fields: [] },
+      case: null,
+      action: "guidance_only"
+    };
+  }
+
   const language = detectLanguage(normalized.message);
   const conversation = await getConversation(normalized.channel, normalized.sender);
   const activeCase = conversation && conversation.active_case_id
@@ -252,10 +262,6 @@ function extractFieldsFromMessage(message, context = {}) {
     fields.message_received_at = context.timestamp;
   }
 
-  if (context.channel && context.sender && context.sender !== "unknown-line-user") {
-    fields.contact = `${context.channel}:${context.sender}`;
-  }
-
   const location = normalizeKnownLocation(context.location) || extractLocation(text);
   if (location) {
     fields.location = location;
@@ -275,6 +281,12 @@ function extractFieldsFromMessage(message, context = {}) {
   const contact = extractContact(text);
   if (contact) {
     fields.contact = contact;
+  }
+
+  // Channel:sender is the most reliable contact; always use it when available
+  // (overrides any phone number the user may have mentioned in passing)
+  if (context.channel && context.sender && context.sender !== "unknown-line-user") {
+    fields.contact = `${context.channel}:${context.sender}`;
   }
 
   if (includesAny(lower, ["receipt", "screenshot", "photo", "picture", "video", "chat", "plate", "license", "ใบเสร็จ", "รูป", "สลิป", "ทะเบียน"])) {

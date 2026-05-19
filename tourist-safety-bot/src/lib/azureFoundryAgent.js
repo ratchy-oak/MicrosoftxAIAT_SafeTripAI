@@ -1,5 +1,7 @@
 const { TOURIST_SAFETY_AGENT_INSTRUCTIONS } = require("./agentInstructions");
 
+const AZURE_AGENT_TIMEOUT_MS = 15000;
+
 const INCIDENT_TYPES = new Set([
   "scam",
   "accident",
@@ -27,30 +29,38 @@ async function runAzureFoundryAgent(message) {
 
   const project = new AIProjectClient(endpoint, new DefaultAzureCredential());
   const openAIClient = project.getOpenAIClient();
-  const conversation = await openAIClient.conversations.create({
-    items: [
-      {
-        type: "message",
-        role: "user",
-        content: buildPrompt(message)
-      }
-    ]
-  });
 
-  const response = await openAIClient.responses.create(
-    {
-      conversation: conversation.id
-    },
-    {
-      body: {
-        agent: {
-          name: agentName,
-          type: "agent_reference"
-        }
-      }
-    }
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Azure Foundry Agent timed out")), AZURE_AGENT_TIMEOUT_MS)
   );
 
+  const agentPromise = (async () => {
+    const conversation = await openAIClient.conversations.create({
+      items: [
+        {
+          type: "message",
+          role: "user",
+          content: buildPrompt(message)
+        }
+      ]
+    });
+
+    return openAIClient.responses.create(
+      {
+        conversation: conversation.id
+      },
+      {
+        body: {
+          agent: {
+            name: agentName,
+            type: "agent_reference"
+          }
+        }
+      }
+    );
+  })();
+
+  const response = await Promise.race([agentPromise, timeoutPromise]);
   return normalizeAgentResult(extractResponseText(response));
 }
 
