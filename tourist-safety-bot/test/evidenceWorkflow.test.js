@@ -233,6 +233,32 @@ test("free-text suspect description fills suspect_detail and advances the workfl
   assert.ok(!result.case.missing_fields.includes("suspect_detail"));
 });
 
+test("runs a full immigration case from report to submission", async () => {
+  const sender = `immigration-${Date.now()}`;
+
+  const first = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "I overstayed my visa and need help",
+    location: null
+  });
+
+  assert.equal(first.action, "case_started");
+  assert.equal(first.case.incident_type, "immigration");
+
+  let result = first;
+  let guard = 0;
+  while (result.case.workflow_state === "collect_evidence" && guard < 12) {
+    result = await processTravelerMessage({ channel: "line", sender, message: "near Chaeng Wattana, I am American", location: null });
+    guard += 1;
+  }
+
+  assert.equal(result.case.workflow_state, "confirm_submit");
+
+  const confirmed = await processTravelerMessage({ channel: "line", sender, message: "yes", location: null });
+  assert.equal(confirmed.action, "case_submitted");
+});
+
 test("returns guidance_only for null message without crashing", async () => {
   const result = await processTravelerMessage({ channel: "line", sender: "user-1", message: null, location: null });
   assert.equal(result.action, "guidance_only");

@@ -10,7 +10,7 @@ const evidenceRequirements = {
   medical: ["current_safety", "location", "symptoms", "urgent_help_needed", "contact"],
   medical_emergency: ["current_safety", "location", "symptoms", "urgent_help_needed", "contact"],
   transport: ["location", "time", "route_or_vehicle", "amount", "evidence", "contact"],
-  immigration: ["issue_type", "nationality", "document_detail", "location", "deadline", "contact"],
+  immigration: ["issue_type", "nationality", "document_detail", "location", "contact"],
   other: ["description", "current_safety", "location", "contact"]
 };
 
@@ -341,10 +341,6 @@ function extractFieldsFromMessage(message, context = {}) {
   const nationality = extractNationality(text);
   if (nationality) {
     fields.nationality = nationality;
-  }
-
-  if (includesAny(lower, ["deadline", "expires", "expire", "today", "tomorrow", "หมดอายุ", "วันนี้", "พรุ่งนี้"])) {
-    fields.deadline = text;
   }
 
   return fields;

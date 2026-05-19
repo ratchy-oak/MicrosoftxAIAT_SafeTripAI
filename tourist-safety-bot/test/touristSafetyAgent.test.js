@@ -60,6 +60,25 @@ test("classifies transport refusal as transport incident", async () => {
   assert.equal(result.should_create_case, true);
 });
 
+test("classifies visa overstay as an immigration case", async () => {
+  const result = await runMockTouristSafetyAgent("I overstayed my visa and need help");
+  assert.equal(result.incident_type, "immigration");
+  assert.equal(result.should_create_case, true);
+});
+
+test("still classifies a lost passport as lost_item, not immigration", async () => {
+  const result = await runMockTouristSafetyAgent("I lost my passport somewhere in Bangkok");
+  assert.equal(result.incident_type, "lost_item");
+  assert.equal(result.should_create_case, true);
+});
+
+test("classifies being followed as a high severity crime", async () => {
+  const result = await runMockTouristSafetyAgent("A man has been following me near my hotel");
+  assert.equal(result.incident_type, "crime");
+  assert.equal(result.severity, "high");
+  assert.equal(result.should_create_case, true);
+});
+
 // --- Thai incident classification ---
 
 test("classifies Thai car accident via รถชน", async () => {

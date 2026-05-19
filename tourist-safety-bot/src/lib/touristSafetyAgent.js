@@ -43,6 +43,21 @@ async function runMockTouristSafetyAgent(message) {
   }
 
   if (includesAny(lower, [
+    // English — note: bare "passport" is intentionally excluded so lost-passport
+    // reports are still classified as lost_item by the block below.
+    "visa", "overstay", "overstayed", "overstaying", "immigration", "deport", "deported",
+    "work permit", "visa expired", "expired visa", "visa run", "visa extension",
+    "extend my visa", "entry stamp", "90 day report", "blacklisted", "tm6", "tm.6",
+    // Thai
+    "วีซ่า", "ตรวจคนเข้าเมือง", "ตม.", "อยู่เกิน", "วีซ่าหมด", "วีซ่าหมดอายุ",
+    "ใบอนุญาตทำงาน", "เวิร์คเพอร์มิต", "รายงานตัว 90 วัน"
+  ])) {
+    incidentType = "immigration";
+    severity = "medium";
+    shouldCreateCase = true;
+  }
+
+  if (includesAny(lower, [
     // English
     "passport", "lost", "wallet", "bag", "phone", "purse", "luggage", "missing item",
     // Thai
@@ -60,11 +75,12 @@ async function runMockTouristSafetyAgent(message) {
     "pickpocket", "purse snatched", "bag snatched", "knife", "weapon", "gun",
     "threat", "threatening", "stabbed", "crime", "drugged", "spiked", "drug",
     "sexual assault", "harassment", "molested", "groped",
+    "followed me", "following me", "being followed", "stalker", "stalking", "stalked",
     // Thai
     "ปล้น", "ขโมย", "ทำร้าย", "ถูกปล้น", "ถูกทำร้าย", "ถูกขโมย", "ถูกทุบ",
     "โดนปล้น", "โดนขโมย", "โดนทำร้าย", "จี้", "วิ่งราว", "ล้วงกระเป๋า",
     "ถูกลักทรัพย์", "มีดาบ", "มีด", "อาวุธ", "ยาเสพติด", "ถูกวางยา",
-    "คุกคาม", "ล่วงละเมิด", "ถูกล่วงละเมิด"
+    "คุกคาม", "ล่วงละเมิด", "ถูกล่วงละเมิด", "สะกดรอย", "ตามคุกคาม"
   ])) {
     incidentType = "crime";
     severity = "high";
@@ -158,6 +174,10 @@ function buildReply({ language, incidentType, severity }) {
       return "รับทราบปัญหาการเดินทางครับ กรุณาแชร์เส้นทาง เลขทะเบียน หรือข้อมูลรถ พร้อมจำนวนเงินที่ถูกเรียกเก็บ เพื่อสร้างรายงาน";
     }
 
+    if (incidentType === "immigration") {
+      return "ผมช่วยเรื่องปัญหาตรวจคนเข้าเมืองได้ครับ กรุณาแจ้งสัญชาติ เอกสารที่เกี่ยวข้อง และสถานที่ที่ต้องไปติดต่อ";
+    }
+
     if (incidentType === "other") {
       return "รับทราบครับ กรุณาเล่ารายละเอียดเหตุการณ์ที่เกิดขึ้น สถานที่ เวลา และสิ่งที่ต้องการความช่วยเหลือ";
     }
@@ -179,6 +199,10 @@ function buildReply({ language, incidentType, severity }) {
 
   if (incidentType === "transport") {
     return "I can help with this transport issue. Please share the route, vehicle details or plate number, and the amount charged.";
+  }
+
+  if (incidentType === "immigration") {
+    return "I can help with this immigration matter. Please share your nationality, the documents involved, and where you need to go.";
   }
 
   if (incidentType === "other") {
