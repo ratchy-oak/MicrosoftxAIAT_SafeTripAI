@@ -362,7 +362,7 @@ function buildReply({ language, incidentType, severity, workflowState, missingFi
     return buildConfirmationReply(language, incidentType, severity, collectedFields);
   }
 
-  const question = buildMissingFieldQuestion(language, missingFields, incidentType);
+  const question = fieldQuestion(missingFields[0], language);
 
   if (language === "th") {
     const safetyPrefix = severity === "high"
@@ -377,17 +377,7 @@ function buildReply({ language, incidentType, severity, workflowState, missingFi
   return `${safetyPrefix}${baseReply ? `${baseReply} ` : ""}${question}`.trim();
 }
 
-function buildMissingFieldQuestion(language, missingFields, incidentType) {
-  const nextField = missingFields[0];
-
-  if (language === "th") {
-    return fieldQuestion(nextField, language, incidentType);
-  }
-
-  return fieldQuestion(nextField, language, incidentType);
-}
-
-function fieldQuestion(field, language, incidentType) {
+function fieldQuestion(field, language) {
   const questions = {
     th: {
       current_safety: "ตอนนี้คุณปลอดภัยไหมครับ?",

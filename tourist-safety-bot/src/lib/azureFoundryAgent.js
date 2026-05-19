@@ -201,7 +201,7 @@ function parseJsonFromText(text) {
 
   try {
     return JSON.parse(cleaned);
-  } catch (error) {
+  } catch {
     const firstBrace = cleaned.indexOf("{");
     const lastBrace = cleaned.lastIndexOf("}");
 
@@ -209,7 +209,11 @@ function parseJsonFromText(text) {
       return null;
     }
 
-    return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1));
+    try {
+      return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1));
+    } catch {
+      return null;
+    }
   }
 }
 

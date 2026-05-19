@@ -51,6 +51,19 @@ app.http("whatsappWebhook", {
       })
     );
 
+    if (normalized.message.startsWith("[Unsupported")) {
+      const unsupportedReply = "Please send a text message describing your situation.";
+      await sendWhatsAppMessage(normalized.sender, unsupportedReply);
+      return {
+        status: 200,
+        jsonBody: {
+          status: "processed",
+          received_message: normalized.message,
+          action: "unsupported_message_type"
+        }
+      };
+    }
+
     const workflowResult = await processTravelerMessage(normalized);
     context.log("Workflow result", JSON.stringify(workflowResult));
 

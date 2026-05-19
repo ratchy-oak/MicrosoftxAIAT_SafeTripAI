@@ -30,6 +30,10 @@ async function replyLineMessage(replyToken, message) {
     };
   }
 
+  // LINE rejects text messages longer than 5000 characters.
+  const text = String(message || "");
+  const safeText = text.length > 5000 ? `${text.slice(0, 4997)}...` : text;
+
   const response = await fetch("https://api.line.me/v2/bot/message/reply", {
     method: "POST",
     headers: {
@@ -41,7 +45,7 @@ async function replyLineMessage(replyToken, message) {
       messages: [
         {
           type: "text",
-          text: message
+          text: safeText
         }
       ]
     })
