@@ -26,34 +26,72 @@ async function runMockTouristSafetyAgent(message) {
   let severity = "low";
   let shouldCreateCase = false;
 
-  if (includesAny(lower, ["scam", "overcharged", "taxi", "rip off", "โกง", "หลอก", "แท็กซี่"])) {
+  if (includesAny(lower, [
+    "scam", "overcharged", "overcharge", "rip off", "rip-off", "fraud", "cheated",
+    "โกง", "หลอก", "แท็กซี่", "ถูกโกง", "ถูกหลอก", "โดนโกง", "โดนหลอก",
+    "คิดเงินเกิน", "เก็บเงินเกิน", "โกงเงิน"
+  ])) {
     incidentType = "scam";
     severity = "medium";
     shouldCreateCase = true;
   }
 
-  if (includesAny(lower, ["passport", "lost", "wallet", "bag", "หาย", "พาสปอร์ต", "กระเป๋า"])) {
+  if (includesAny(lower, [
+    "passport", "lost", "wallet", "bag", "phone",
+    "หาย", "พาสปอร์ต", "กระเป๋า", "โทรศัพท์", "มือถือ", "กระเป๋าเงิน",
+    "ของหาย", "สูญหาย", "วางลืม"
+  ])) {
     incidentType = "lost_item";
     severity = severity === "medium" ? "medium" : "low";
     shouldCreateCase = true;
   }
 
-  if (includesAny(lower, ["robbed", "stolen", "assault", "threat", "crime", "ปล้น", "ขโมย", "ทำร้าย"])) {
+  if (includesAny(lower, [
+    "robbed", "robbery", "stolen", "assault", "assaulted", "attacked", "mugged",
+    "threat", "threatening", "stabbed", "crime",
+    "ปล้น", "ขโมย", "ทำร้าย", "ถูกปล้น", "ถูกทำร้าย", "ถูกขโมย", "ถูกทุบ",
+    "โดนปล้น", "โดนขโมย", "โดนทำร้าย", "จี้", "วิ่งราว", "ล้วงกระเป๋า"
+  ])) {
     incidentType = "crime";
     severity = "high";
     shouldCreateCase = true;
   }
 
-  if (includesAny(lower, ["accident", "injured", "hurt", "bleeding", "crash", "อุบัติเหตุ", "เจ็บ", "เลือด"])) {
+  if (includesAny(lower, [
+    "accident", "crash", "hit by", "knocked down", "fell", "injured", "hurt", "bleeding",
+    "อุบัติเหตุ", "รถชน", "ถูกรถ", "ชนรถ", "ถูกชน", "โดนรถชน",
+    "เจ็บ", "บาดเจ็บ", "เลือด", "ล้ม", "หกล้ม", "ตก"
+  ])) {
     incidentType = "accident";
     severity = "high";
     shouldCreateCase = true;
   }
 
-  if (includesAny(lower, ["hospital", "medical", "emergency", "ambulance", "โรงพยาบาล", "ฉุกเฉิน", "ป่วย"])) {
+  if (includesAny(lower, [
+    "hospital", "medical", "emergency", "ambulance", "sick", "faint", "unconscious",
+    "โรงพยาบาล", "ฉุกเฉิน", "ป่วย", "หมดสติ", "เป็นลม",
+    "หายใจไม่ออก", "เจ็บหน้าอก", "หัวใจ", "ชัก"
+  ])) {
     incidentType = "medical_emergency";
     severity = "high";
     shouldCreateCase = true;
+  }
+
+  if (!shouldCreateCase && includesAny(lower, [
+    "transport", "tuk-tuk", "tuk tuk", "songthaew", "boat", "bus", "train", "ferry",
+    "meter tamper", "wrong route",
+    "ทุกทุก", "สองแถว", "เรือ", "รถเมล์", "รถไฟ", "รถบัส",
+    "มิเตอร์", "ค่าโดยสาร", "ไม่ยอมไป", "ไม่ยอมพา"
+  ])) {
+    incidentType = "transport";
+    severity = "medium";
+    shouldCreateCase = true;
+  }
+
+  // Broad fallback: Thai real-incident prefix "ถูก"/"โดน" not caught by specific keywords above
+  if (!shouldCreateCase && (lower.includes("โดน") || lower.includes("ถูก")) && lower.length > 5) {
+    shouldCreateCase = true;
+    severity = "medium";
   }
 
   return {
@@ -84,6 +122,10 @@ function buildReply({ language, incidentType, severity }) {
       return "ผมช่วยบันทึกเหตุของหายได้ครับ กรุณาส่งตำแหน่งล่าสุด รายละเอียดสิ่งของ และช่องทางติดต่อกลับ";
     }
 
+    if (incidentType === "transport") {
+      return "รับทราบปัญหาการเดินทางครับ กรุณาแชร์เส้นทาง เลขทะเบียน หรือข้อมูลรถ พร้อมจำนวนเงินที่ถูกเรียกเก็บ เพื่อสร้างรายงาน";
+    }
+
     return "ขอบคุณที่แจ้งข้อมูลครับ กรุณาเล่ารายละเอียดเพิ่มเติม เช่น สถานที่ เวลา และสิ่งที่เกิดขึ้น";
   }
 
@@ -97,6 +139,10 @@ function buildReply({ language, incidentType, severity }) {
 
   if (incidentType === "lost_item") {
     return "I can help prepare a lost item report. Please share the last known location, item details, and a contact method.";
+  }
+
+  if (incidentType === "transport") {
+    return "I can help with this transport issue. Please share the route, vehicle details or plate number, and the amount charged.";
   }
 
   return "Thank you for reporting. Please share more details such as location, time, and what happened.";

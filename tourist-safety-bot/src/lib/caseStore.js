@@ -2,6 +2,7 @@ const { TableClient } = require("@azure/data-tables");
 
 const tableName = process.env.CASES_TABLE_NAME || "SafeTripCases";
 const memoryCases = [];
+let caseIdCounter = 0;
 let tableClient;
 let tableReadyPromise;
 
@@ -70,7 +71,7 @@ function buildCaseRecord({
 }) {
   const now = new Date();
   return {
-    case_id: `CASE-${now.getTime()}`,
+    case_id: `CASE-${now.getTime()}-${(++caseIdCounter).toString().padStart(4, "0")}`,
     timestamp: now.toISOString(),
     channel,
     sender,

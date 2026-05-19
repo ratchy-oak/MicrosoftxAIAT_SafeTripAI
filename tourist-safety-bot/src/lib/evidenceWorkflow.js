@@ -444,7 +444,18 @@ function isConfirmation(message) {
     "ตกลง",
     "ใช่",
     "โอเค"
-  ].some((keyword) => lower === keyword || lower.includes(keyword));
+  ].some((keyword) => {
+    if (lower === keyword) {
+      return true;
+    }
+
+    // Short words need word boundaries to avoid partial matches (e.g. "ok" in "Asok", "Bangkok")
+    if (keyword.length <= 4) {
+      return new RegExp(`\\b${keyword}\\b`).test(lower);
+    }
+
+    return lower.includes(keyword);
+  });
 }
 
 function extractLocation(text) {

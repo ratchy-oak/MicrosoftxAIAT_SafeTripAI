@@ -89,6 +89,64 @@ test("keeps hypothetical advice questions out of the case workflow", async () =>
   assert.deepEqual(result.agent_result.missing_fields, []);
 });
 
+test("classifies Thai car accident report and collects safety fields", async () => {
+  const sender = `thai-accident-${Date.now()}`;
+
+  const first = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "ผมถูกรถชน แถวบางมด",
+    location: null
+  });
+
+  assert.equal(first.action, "case_started");
+  assert.equal(first.case.incident_type, "accident");
+  assert.equal(first.case.severity, "high");
+  assert.equal(first.case.workflow_state, "collect_evidence");
+  assert.equal(first.case.collected_fields.location, "บางมด");
+  assert.ok(first.case.missing_fields.includes("current_safety"));
+  assert.ok(first.case.missing_fields.includes("injury_status"));
+
+  const second = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "บางมด 9 โมง รถชน ตอนนี้ปลอดภัยแล้ว ไม่มีคนบาดเจ็บ",
+    location: null
+  });
+
+  assert.equal(second.action, "case_updated");
+  assert.equal(second.case.case_id, first.case.case_id);
+  assert.ok(!second.case.missing_fields.includes("current_safety"));
+  assert.ok(!second.case.missing_fields.includes("injury_status"));
+});
+
+test("restarts a fresh case when user reports new incident while previous case awaits confirmation", async () => {
+  const sender = `stale-guard-${Date.now()}`;
+
+  const first = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "I was overcharged by taxi near Siam on May 18 around 8 PM. I paid 1200 baht and have a receipt photo.",
+    location: null
+  });
+
+  assert.equal(first.action, "case_started");
+  assert.equal(first.case.workflow_state, "confirm_submit");
+  const firstCaseId = first.case.case_id;
+
+  const second = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "I was robbed near Asok BTS just now",
+    location: null
+  });
+
+  assert.equal(second.action, "case_started");
+  assert.notEqual(second.case.case_id, firstCaseId);
+  assert.equal(second.case.incident_type, "crime");
+  assert.equal(second.case.severity, "high");
+});
+
 test("extracts time and place from later evidence updates without overwriting the original report", async () => {
   const sender = `lost-item-${Date.now()}`;
 
