@@ -11,7 +11,7 @@ const evidenceRequirements = {
   medical_emergency: ["current_safety", "location", "symptoms", "urgent_help_needed", "contact"],
   transport: ["location", "time", "route_or_vehicle", "amount", "evidence", "contact"],
   immigration: ["issue_type", "nationality", "document_detail", "location", "deadline", "contact"],
-  other: ["description", "location", "contact"]
+  other: ["description", "current_safety", "location", "contact"]
 };
 
 async function processTravelerMessage(normalized) {

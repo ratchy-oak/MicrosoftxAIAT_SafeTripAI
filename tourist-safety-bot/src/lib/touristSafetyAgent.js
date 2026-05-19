@@ -75,8 +75,8 @@ async function runMockTouristSafetyAgent(message) {
     // English
     "accident", "crash", "hit by", "knocked down", "fell", "injured", "hurt", "bleeding",
     "motorbike accident", "bicycle accident", "car accident",
-    // Thai
-    "อุบัติเหตุ", "รถชน", "ถูกรถ", "ชนรถ", "ถูกชน", "โดนรถชน",
+    // Thai — also match "ชน" standalone (collision) since Thai autocorrect can mangle "รถ"
+    "อุบัติเหตุ", "รถชน", "ถูกรถ", "ชนรถ", "ถูกชน", "โดนรถชน", "ชน",
     "เจ็บ", "บาดเจ็บ", "เลือด", "ล้ม", "หกล้ม", "ตก", "ถูกจักรยาน", "ถูกมอเตอร์ไซค์"
   ])) {
     incidentType = "accident";
