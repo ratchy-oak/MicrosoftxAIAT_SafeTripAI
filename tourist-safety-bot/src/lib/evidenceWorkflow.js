@@ -257,11 +257,56 @@ function extractFieldsFromMessage(message, context = {}) {
     fields.contact = contact;
   }
 
-  if (includesAny(lower, ["receipt", "screenshot", "photo", "picture", "video", "chat", "plate", "license", "ใบเสร็จ", "รูป", "สลิป", "ทะเบียน"])) {
+  if (includesAny(lower, [
+    "receipt",
+    "screenshot",
+    "photo",
+    "picture",
+    "video",
+    "chat",
+    "plate",
+    "license",
+    "cctv",
+    "camera",
+    "ใบเสร็จ",
+    "รูป",
+    "รูปภาพ",
+    "ภาพ",
+    "สลิป",
+    "ทะเบียน",
+    "หลักฐาน",
+    "กล้องวงจร",
+    "วงจรปิด",
+    "กล้องวงจรปิด",
+    "คลิป",
+    "วิดีโอ",
+    "แชต"
+  ])) {
     fields.evidence = text;
   }
 
-  if (includesAny(lower, ["taxi", "driver", "shop", "seller", "hotel", "tour", "plate", "license", "แท็กซี่", "คนขับ", "ร้าน", "โรงแรม", "ทะเบียน"])) {
+  if (includesAny(lower, [
+    "taxi",
+    "driver",
+    "shop",
+    "seller",
+    "hotel",
+    "tour",
+    "plate",
+    "license",
+    "motorbike taxi",
+    "motorcycle taxi",
+    "แท็กซี่",
+    "คนขับ",
+    "ร้าน",
+    "โรงแรม",
+    "ทะเบียน",
+    "วินมอเตอร์ไซค์",
+    "วินมอเตอร์ไซต์",
+    "มอเตอร์ไซค์",
+    "มอเตอร์ไซต์",
+    "ผู้ให้บริการ"
+  ])) {
     fields.person_or_business = text;
     fields.route_or_vehicle = text;
   }
@@ -285,7 +330,33 @@ function extractFieldsFromMessage(message, context = {}) {
     fields.item_detail = text;
   }
 
-  if (includesAny(lower, ["suspect", "thief", "robber", "attacker", "คนร้าย", "ขโมย", "ผู้ต้องสงสัย"])) {
+  if (includesAny(lower, [
+    "suspect",
+    "thief",
+    "robber",
+    "attacker",
+    "offender",
+    "assailant",
+    "คนร้าย",
+    "ขโมย",
+    "ผู้ต้องสงสัย",
+    "ผู้ก่อเหตุ",
+    "คนก่อเหตุ",
+    "คนทำ",
+    "วินมอเตอร์ไซค์",
+    "วินมอเตอร์ไซต์",
+    "มอเตอร์ไซค์",
+    "มอเตอร์ไซต์",
+    "ผู้ชาย",
+    "ชาย",
+    "ผู้หญิง",
+    "หญิง",
+    "วัยกลางคน",
+    "ผมขาว",
+    "เสื้อ",
+    "รูปร่าง",
+    "ลักษณะ"
+  ])) {
     fields.suspect_detail = text;
   }
 

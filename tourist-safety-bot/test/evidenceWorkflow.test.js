@@ -119,3 +119,55 @@ test("extracts time and place from later evidence updates without overwriting th
   assert.ok(!second.case.missing_fields.includes("last_seen_location"));
   assert.ok(!second.case.missing_fields.includes("time"));
 });
+
+test("does not repeat Thai evidence and suspect-detail prompts once provided", async () => {
+  const sender = `thai-crime-${Date.now()}`;
+
+  const first = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "ผมโดนทำร้ายที่สยามเมื่อคืน",
+    location: null
+  });
+
+  assert.equal(first.action, "case_started");
+  assert.equal(first.case.incident_type, "crime");
+  assert.ok(first.case.missing_fields.includes("suspect_detail"));
+  assert.ok(first.case.missing_fields.includes("evidence"));
+
+  const withEvidence = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "มีหลักฐานเป็นรูปจากกล้องวงจร",
+    location: null
+  });
+
+  assert.equal(withEvidence.action, "case_updated");
+  assert.ok(withEvidence.case.collected_fields.evidence);
+  assert.ok(!withEvidence.case.missing_fields.includes("evidence"));
+  assert.doesNotMatch(withEvidence.reply, /หลักฐาน/);
+
+  const withSuspectType = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "ผู้ก่อเหตุเป็นวินมอเตอร์ไซต์",
+    location: null
+  });
+
+  assert.equal(withSuspectType.action, "case_updated");
+  assert.ok(withSuspectType.case.collected_fields.suspect_detail);
+  assert.ok(!withSuspectType.case.missing_fields.includes("suspect_detail"));
+  assert.doesNotMatch(withSuspectType.reply, /รายละเอียดผู้ก่อเหตุ/);
+
+  const withSuspectDescription = await processTravelerMessage({
+    channel: "line",
+    sender,
+    message: "รายละเอียดผู้ก่อเหตุเป็นชายวัยกลางคนผมขาว",
+    location: null
+  });
+
+  assert.equal(withSuspectDescription.action, "case_updated");
+  assert.match(withSuspectDescription.case.collected_fields.suspect_detail, /ชายวัยกลางคน/);
+  assert.ok(!withSuspectDescription.case.missing_fields.includes("suspect_detail"));
+  assert.doesNotMatch(withSuspectDescription.reply, /รายละเอียดผู้ก่อเหตุ/);
+});

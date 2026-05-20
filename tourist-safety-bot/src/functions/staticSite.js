@@ -845,7 +845,7 @@ const html = `<!doctype html>
         </div>
         <div class="field">
           <label for="caseSender">Sender</label>
-          <input id="caseSender" placeholder="dashboard-user">
+          <input id="caseSender" placeholder="-">
         </div>
         <div class="field">
           <label for="caseType">Incident type</label>
@@ -881,7 +881,7 @@ const html = `<!doctype html>
         </div>
         <div class="field">
           <label for="caseLocation">Location</label>
-          <input id="caseLocation" placeholder="Siam, Bangkok">
+          <input id="caseLocation" placeholder="-">
         </div>
         <div class="field">
           <label for="caseWorkflow">Workflow</label>
@@ -912,54 +912,54 @@ const html = `<!doctype html>
         </div>
         <div class="field span-2">
           <label for="caseMissingFields">Missing fields</label>
-          <input id="caseMissingFields" placeholder="location, time, evidence">
+          <input id="caseMissingFields" placeholder="-">
         </div>
         <div class="field-section">
           <div class="field-section-title">Collected information</div>
           <div class="field-grid">
             <div class="field">
               <label for="caseCollectedTime">Time</label>
-              <input id="caseCollectedTime" placeholder="May 18, around 8 PM">
+              <input id="caseCollectedTime" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedAmount">Amount</label>
-              <input id="caseCollectedAmount" placeholder="1200 baht">
+              <input id="caseCollectedAmount" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedContact">Contact</label>
-              <input id="caseCollectedContact" placeholder="LINE ID, phone, or email">
+              <input id="caseCollectedContact" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedItem">Item</label>
-              <input id="caseCollectedItem" placeholder="passport, wallet, phone">
+              <input id="caseCollectedItem" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedParty">Person / business</label>
-              <input id="caseCollectedParty" placeholder="taxi, shop, hotel, driver">
+              <input id="caseCollectedParty" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedVehicle">Route / vehicle</label>
-              <input id="caseCollectedVehicle" placeholder="taxi plate, route, vehicle detail">
+              <input id="caseCollectedVehicle" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedSafety">Current safety</label>
-              <input id="caseCollectedSafety" placeholder="safe now, still in danger">
+              <input id="caseCollectedSafety" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedInjury">Injury status</label>
-              <input id="caseCollectedInjury" placeholder="no injury, injured, bleeding">
+              <input id="caseCollectedInjury" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedSuspect">Suspect detail</label>
-              <input id="caseCollectedSuspect" placeholder="appearance, direction, name">
+              <input id="caseCollectedSuspect" placeholder="-">
             </div>
             <div class="field">
               <label for="caseCollectedDeadline">Deadline</label>
-              <input id="caseCollectedDeadline" placeholder="visa expiry, appointment, due date">
+              <input id="caseCollectedDeadline" placeholder="-">
             </div>
             <div class="field span-2">
               <label for="caseCollectedEvidence">Evidence</label>
-              <textarea id="caseCollectedEvidence" placeholder="receipt photo, screenshot, chat record, plate number"></textarea>
+              <textarea id="caseCollectedEvidence" placeholder="-"></textarea>
             </div>
           </div>
         </div>
@@ -968,15 +968,15 @@ const html = `<!doctype html>
           <div class="field-grid">
             <div class="field span-2">
               <label for="caseReportSummary">Summary</label>
-              <textarea id="caseReportSummary" placeholder="Short summary for officer follow-up"></textarea>
+              <textarea id="caseReportSummary" placeholder="-"></textarea>
             </div>
             <div class="field">
               <label for="caseReportAction">Recommended action</label>
-              <input id="caseReportAction" placeholder="Officer follow-up recommended">
+              <input id="caseReportAction" placeholder="-">
             </div>
             <div class="field">
               <label for="caseReportPriority">Priority note</label>
-              <input id="caseReportPriority" placeholder="urgent, normal, needs more evidence">
+              <input id="caseReportPriority" placeholder="-">
             </div>
           </div>
         </div>
@@ -1151,9 +1151,9 @@ const html = `<!doctype html>
           + "<td data-label='Severity'><span class='pill " + escapeHtml(item.severity || "low") + "'>" + escapeHtml(item.severity || "low") + "</span></td>"
           + "<td data-label='Workflow'>" + renderWorkflowPill(item.workflow_state || "manual") + "</td>"
           + "<td data-label='Evidence'><span class='evidence " + escapeHtml(item.evidence_status || "unknown") + "'>" + escapeHtml(item.evidence_status || "unknown") + "</span><div class='meta'>" + escapeHtml(formatMissingFields(item.missing_fields)) + "</div></td>"
-          + "<td data-label='Location'>" + escapeHtml(item.location || "Unknown location") + "</td>"
+          + "<td data-label='Location'>" + escapeHtml(displayValue(item.location)) + "</td>"
           + "<td data-label='Status'>" + renderStatusPill(item.status || "New") + "</td>"
-          + "<td data-label='Description'><div class='description-cell'><div class='description-text'>" + escapeHtml(item.description || "") + "</div>" + renderCollectedDetails(item.collected_fields) + renderLastReply(item.last_reply) + "</div></td>"
+          + "<td data-label='Description'><div class='description-cell'><div class='description-text'>" + escapeHtml(displayValue(item.description)) + "</div>" + renderCollectedDetails(item.collected_fields) + renderLastReply(item.last_reply) + "</div></td>"
           + "<td data-label='Actions'><div class='row-actions'><button class='link-button' data-action='edit' data-id='" + escapeHtml(item.case_id) + "' type='button'>Edit</button><button class='delete-button' data-action='delete' data-id='" + escapeHtml(item.case_id) + "' type='button'>Delete</button></div></td>";
         elements.caseRows.appendChild(row);
       }
@@ -1206,6 +1206,11 @@ const html = `<!doctype html>
 
     function setField(id, value) {
       document.querySelector("#" + id).value = value || "";
+    }
+
+    function displayValue(value) {
+      const text = String(value || "").trim();
+      return text && text !== "Unknown location" ? text : "-";
     }
 
     function getPayload() {
@@ -1276,8 +1281,7 @@ const html = `<!doctype html>
       const collectedFields = buildCollectedFields();
       const summary = document.querySelector("#caseReportSummary").value.trim()
         || document.querySelector("#caseDescription").value.trim();
-      const recommendedAction = document.querySelector("#caseReportAction").value.trim()
-        || "Officer follow-up recommended";
+      const recommendedAction = document.querySelector("#caseReportAction").value.trim();
       const priorityNote = document.querySelector("#caseReportPriority").value.trim();
 
       if (!summary && !Object.keys(collectedFields).length) {
