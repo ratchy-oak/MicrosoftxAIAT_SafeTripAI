@@ -10,8 +10,7 @@
   "scripts": {
     "start": "func start",
     "create:foundry-agent": "node scripts/create-foundry-agent.mjs",
-    "eval:demo": "node scripts/evaluate-demo.mjs",
-    "test": "node --test"
+    "eval:demo": "node scripts/evaluate-demo.mjs"
   },
   "dependencies": {
     "@azure/ai-projects": "^2.1.1",
